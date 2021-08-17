@@ -34,10 +34,9 @@ export default defineComponent({
     `)
 
     const handleChange = (e: Event) => {
-      data.value.append('file', (e.currentTarget as HTMLInputElement).files![0])
-      console.log(JSON.stringify(data.value.get('file')))
+      const file = (e.currentTarget as HTMLInputElement).files![0]
       mutate({
-        file: JSON.stringify((e.currentTarget as HTMLInputElement).files![0])
+        file
       })
     }
 

@@ -13,7 +13,6 @@ import { defineComponent, ref } from 'vue'
 export default defineComponent({
   name: 'App',
   setup() {
-    const data = ref<FormData>(new FormData())
     const { result } = useQuery(gql`
       query books {
         books {

@@ -1,28 +1,38 @@
 <template>
   <input type="file" @change="handleChange" name="" id="">
-  <ul v-for="book in books">
+  <div>{{ me?.id }} - {{ me?.name }}</div>
+  <!-- <ul v-for="book in books">
     <li>{{ book.author }}-{{ book.title }}</li>
-  </ul>
+  </ul> -->
 </template>
 
 <script lang="ts">
 import { useQuery, useMutation, useResult } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
+
+interface IMe {
+  id: number
+  name: string
+}
+
+interface IData {
+  me: IMe
+}
 
 export default defineComponent({
   name: 'App',
   setup() {
-    const { result } = useQuery(gql`
-      query books {
-        books {
-          author
-          title
+    const { result } = useQuery<IData>(gql`
+      query me {
+        me {
+          id
+          name
         }
       }
     `)
 
-    const books = useResult(result, [], (data: { books: Array<any> }) => data.books)
+    const me = useResult(result)
 
     const { mutate } = useMutation(gql`
       mutation mu($file: Upload!) {
@@ -40,7 +50,7 @@ export default defineComponent({
     }
 
     return {
-      books,
+      me,
       handleChange
     }
   }

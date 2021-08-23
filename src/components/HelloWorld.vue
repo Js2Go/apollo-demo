@@ -15,6 +15,7 @@
 import { useQuery, useMutation, useResult, useSubscription } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 import { defineComponent, reactive, ref, watch } from 'vue'
+import tokenUtil from '../util/token'
 
 interface UserForm {
   username: string
@@ -90,7 +91,7 @@ export default defineComponent({
       const data = await loginMutate.mutate({
         user
       })
-      localStorage.setItem(data?.data.login.username, data?.data.login.token)
+      tokenUtil.setToken(data?.data.login.token)
       toFetch()
     }
 

@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { ApolloClient, InMemoryCache, split } from '@apollo/client/core'
 import { createPersistedQueryLink } from '@apollo/client/link/persisted-queries'
 import { WebSocketLink } from '@apollo/client/link/ws'
+import { setContext } from '@apollo/client/link/context'
 import { getMainDefinition } from '@apollo/client/utilities'
 import { DefaultApolloClient } from '@vue/apollo-composable'
 import { createUploadLink } from 'apollo-upload-client'
@@ -11,22 +12,35 @@ import ElementPlus from 'element-plus'
 import 'element-plus/lib/theme-chalk/index.css'
 
 import App from './App.vue'
+import { TOKEN_STR } from './util/token'
 
-const linkChain = createPersistedQueryLink({
+const authLink = setContext((_, { headers }) => {
+  // get the authentication token from local storage if it exists
+  const token = localStorage.getItem(TOKEN_STR)
+  // return the headers to the context so httpLink can read them
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : ``,
+    },
+  }
+})
+
+const linkChain = authLink.concat(createPersistedQueryLink({
   sha256,
   useGETForHashedQueries: true
-}).concat(createUploadLink({
+})).concat(createUploadLink({
   uri: 'http://localhost:8899/graphql',
-  headers: {
-    authorization: localStorage.getItem('mazi')!
-  }
 }) as any)
 
-const wsLink = new WebSocketLink({
+let wsLink = new WebSocketLink({
   uri: 'ws://localhost:8899/graphql',
   options: {
-    reconnect: true
-  }
+    reconnect: true,
+    connectionParams: {
+      authorization: localStorage.getItem(TOKEN_STR)!
+    }
+  },
 })
 
 const cache = new InMemoryCache()

@@ -15,7 +15,6 @@ const tokenUtil: Token = {
     } else {
       this.token = localStorage.getItem(TOKEN_STR)!
     }
-    console.log(this.token)
     return this.token
   },
   setToken(token) {

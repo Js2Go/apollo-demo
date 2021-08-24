@@ -9,12 +9,13 @@
   <button @click="login">login</button>
   <button @click="toFetch">toFetch</button>
   <button @click="createPost">createPost</button>
+  <button @click="start">start</button>
 </template>
 
 <script lang="ts">
 import { useQuery, useMutation, useResult, useSubscription } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
-import { defineComponent, reactive, ref, watch } from 'vue'
+import { defineComponent, nextTick, reactive, ref, watch } from 'vue'
 import tokenUtil from '../util/token'
 
 interface UserForm {
@@ -40,6 +41,7 @@ export default defineComponent({
     })
 
     const enabled = ref<boolean>(false)
+    const subEnable = ref<boolean>(false)
   
     const { result, refetch, subscribeToMore } = useQuery<IData>(gql`
       query me {
@@ -125,13 +127,20 @@ export default defineComponent({
           comment
         }
       }
-    `)
+    `, null, {
+      // it does not work yet
+      enabled: subEnable.value,
+    })
 
     watch(sub.result, (res) => {
       console.log(res)
     }, {
       immediate: false
     })
+
+    const start = async () => {
+      subEnable.value = true
+    }
 
     const createPost = async () => {
       await createPostMutate.mutate({
@@ -146,7 +155,8 @@ export default defineComponent({
       handleChange,
       login,
       toFetch,
-      createPost
+      createPost,
+      start
     }
   }
 })

@@ -12,7 +12,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/lib/theme-chalk/index.css'
 
 import App from './App.vue'
-import { TOKEN_STR } from './util/token'
+import tokenUtil, { TOKEN_STR } from './util/token'
 
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists
@@ -37,9 +37,9 @@ let wsLink = new WebSocketLink({
   uri: 'ws://localhost:8899/graphql',
   options: {
     reconnect: true,
-    connectionParams: {
-      authorization: localStorage.getItem(TOKEN_STR)!
-    }
+    connectionParams: () => ({
+      authorization: tokenUtil.getToken()
+    })
   },
 })
 

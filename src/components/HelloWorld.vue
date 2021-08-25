@@ -129,7 +129,7 @@ export default defineComponent({
       }
     `, null, {
       // it does not work yet
-      enabled: subEnable.value,
+      // enabled: subEnable.value,
     })
 
     watch(sub.result, (res) => {

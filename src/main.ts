@@ -26,15 +26,32 @@ const authLink = setContext((_, { headers }) => {
   }
 })
 
+const getUri = (isWs: boolean = false): string => {
+  let protocol = `${import.meta.env.VITE_SERVER_PROTOCOL}://`;
+
+  if (isWs) {
+    protocol = `${import.meta.env.VITE_WS_SERVER_PROTOCOL}://`
+  }
+
+  const uri = protocol +
+    `${import.meta.env.VITE_SERVER_HOST}:` +
+    `${import.meta.env.VITE_SERVER_PORT}` +
+    `${import.meta.env.VITE_SERVER_PATH}`
+  
+  console.log(uri)
+
+  return uri
+}
+
 const linkChain = authLink.concat(createPersistedQueryLink({
   sha256,
   useGETForHashedQueries: true
 })).concat(createUploadLink({
-  uri: 'http://localhost:8899/graphql',
+  uri: getUri(),
 }) as any)
 
 let wsLink = new WebSocketLink({
-  uri: 'ws://localhost:8899/graphql',
+  uri: getUri(true),
   options: {
     reconnect: true,
     connectionParams: () => ({
